@@ -1,7 +1,9 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class ProjectileTurret : MonoBehaviour
 {
@@ -19,44 +21,77 @@ public class ProjectileTurret : MonoBehaviour
     Ray cameraRay;
 
     List<Vector3> points = new List<Vector3>();
-    Vector3 newPoint;
-    [SerializeField] float distance = 1000f;
+    Vector3 startingPoint;
+    Vector3 newPoint2;
+    GameObject testBullet;
+    Vector3 theVel;
 
     GameObject surface;
 
     // Start is called before the first frame update
     //void Start()
-    //
-
+    //{
+        
     //}
 
     // Update is called once per frame
     void Update()
     {
-        points.Clear();
-        points.Add(barrelEnd.position);
+        
 
         if (Input.GetButtonDown("Fire1"))
+        {
             Fire();
+            //StartCoroutine(printTime());
+        }
+            
 
         TrackMouse();
         TurnBase();
         RotateGun();
+        theCurve();
 
-        if (Physics.Raycast(barrelEnd.position, barrelEnd.forward, out RaycastHit hit, distance, targetLayer))
+        //if (Physics.Raycast(barrelEnd.position, barrelEnd.forward, out RaycastHit hit, 100, targetLayer))
+        //{
+            //newPoint = new Vector3(hit.point.x, crosshair.transform.position.y, hit.point.z);
+            //points.Add(newPoint);
+            //float? theY = CalculateTrajectory(crosshair.transform.position, useLowAngle);
+            //newPoint2 = new Vector3(newPoint.x, crosshair.transform.position.y * 0.5f, newPoint.z);
+            //if(testBullet != null)
+            //{
+                //newPoint2 = new Vector3(newPoint.x, testBullet.transform.position.y, newPoint.z);
+                //points.Add(newPoint2);
+            //}
+
+            //line.positionCount = points.Count;
+            //for (int i = 0; i < line.positionCount; i++)
+            //{
+                //line.SetPosition(i, points[i]);
+            //}
+        //}
+    }
+
+    void theCurve()
+    {
+        points.Clear();
+        points.Add(barrelEnd.position);
+        theVel = barrelEnd.forward * projectileSpeed;
+
+        for (float time = 0f; time < 5.0f; time += 0.1f)
         {
-            newPoint = new Vector3(hit.point.x, crosshair.transform.position.y, hit.point.z);
-            points.Add(newPoint);
-
-            line.positionCount = points.Count;
-            for (int i = 0; i < line.positionCount; i++)
-            {
-                line.SetPosition(i, points[i]);
-            }
+            startingPoint = barrelEnd.position;
+            Vector3 newPoint = (theVel * time) + (1/2f * -gravity * Mathf.Pow(time, 2));
+            startingPoint += newPoint;
+            points.Add(startingPoint);
+            if (Physics.Raycast(barrelEnd.position, startingPoint, out RaycastHit hit, 1000, targetLayer))
+                break;
         }
 
-
-
+        line.positionCount = points.Count;
+        for (int i = 0; i < line.positionCount; i++)
+        {
+            line.SetPosition(i, points[i]);
+        }
     }
 
     void Fire()
@@ -81,7 +116,6 @@ public class ProjectileTurret : MonoBehaviour
                 crosshair.transform.position = hit.point + hit.normal * 0.1f;
             }
         }
-
     }
 
     void TurnBase()
@@ -96,6 +130,7 @@ public class ProjectileTurret : MonoBehaviour
         float? angle = CalculateTrajectory(crosshair.transform.position, useLowAngle);
         if (angle != null)
             gun.transform.localEulerAngles = new Vector3(360f - (float)angle, 0, 0);
+            
     }
 
     float? CalculateTrajectory(Vector3 target, bool useLow)
