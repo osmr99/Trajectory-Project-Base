@@ -25,39 +25,39 @@ public class LaserTurret : MonoBehaviour
     float negRotationY;
     float negRotationZ;
 
-    [SerializeField] bool flipX = true;
-    [SerializeField] bool flipY = true;
-    [SerializeField] bool flipZ = true;
+    bool flipX = true;
+    bool flipY = true;
+    bool flipZ = true;
     //bool flipXtwo = false;
     //bool flipYtwo = false;
     //bool flipZtwo = false;
 
     // Start is called before the first frame update
-    void Start()
-    {
+    //void Start()
+    //{
         
-    }
+   // }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetButtonDown("flipXX"))
-        {
+        //if (Input.GetButtonDown("flipXX"))
+        //{
             //flipXtwo = !flipXtwo;
             //flipX = !flipX;
-        }
+        //}
 
-        if (Input.GetButtonDown("flipYY"))
-        {
+        //if (Input.GetButtonDown("flipYY"))
+        //{
             //flipYtwo = !flipYtwo;
             //flipY = !flipY;
-        }
+        //}
 
-        if (Input.GetButtonDown("flipZZ"))
-        {
+        //if (Input.GetButtonDown("flipZZ"))
+        //{
             //flipZtwo = !flipZtwo;
             //flipZ = !flipZ;
-        }
+        //}
             
 
 

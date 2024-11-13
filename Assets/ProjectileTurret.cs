@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ProjectileTurret : MonoBehaviour
@@ -15,43 +16,72 @@ public class ProjectileTurret : MonoBehaviour
     [SerializeField] Transform barrelEnd;
     [SerializeField] LineRenderer line;
     [SerializeField] bool useLowAngle;
+    Ray cameraRay;
 
     List<Vector3> points = new List<Vector3>();
+    Vector3 newPoint;
+    [SerializeField] float distance = 1000f;
+
+    GameObject surface;
 
     // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    //void Start()
+    //
+
+    //}
 
     // Update is called once per frame
     void Update()
     {
+        points.Clear();
+        points.Add(barrelEnd.position);
+
+        if (Input.GetButtonDown("Fire1"))
+            Fire();
+
         TrackMouse();
         TurnBase();
         RotateGun();
 
-        if (Input.GetButtonDown("Fire1"))
-            Fire();
+        if (Physics.Raycast(barrelEnd.position, barrelEnd.forward, out RaycastHit hit, distance, targetLayer))
+        {
+            newPoint = new Vector3(hit.point.x, crosshair.transform.position.y, hit.point.z);
+            points.Add(newPoint);
+
+            line.positionCount = points.Count;
+            for (int i = 0; i < line.positionCount; i++)
+            {
+                line.SetPosition(i, points[i]);
+            }
+        }
+
+
+
     }
 
     void Fire()
     {
         GameObject projectile = Instantiate(projectilePrefab, barrelEnd.position, gun.transform.rotation);
         projectile.GetComponent<Rigidbody>().velocity = projectileSpeed * barrelEnd.transform.forward;
+        projectile.GetComponent<Projectile>().lifeTime(5.0f);
     }
 
     void TrackMouse()
     {
-        Ray cameraRay = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        if(Input.mousePosition != null)
+            cameraRay = Camera.main.ScreenPointToRay(Input.mousePosition);
 
         RaycastHit hit;
-        if(Physics.Raycast(cameraRay, out hit, 1000, targetLayer))
+        if(cameraRay.direction != null)
         {
-            crosshair.transform.forward = hit.normal;
-            crosshair.transform.position = hit.point + hit.normal * 0.1f;
-            //Debug.Log("hit ground");
+            if (Physics.Raycast(cameraRay, out hit, 1000, targetLayer))
+            {
+                crosshair.transform.forward = hit.normal;
+                crosshair.transform.position = hit.point + hit.normal * 0.1f;
+            }
         }
+
     }
 
     void TurnBase()
